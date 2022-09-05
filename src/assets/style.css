@@ -1,0 +1,29 @@
+.title {
+    color: #106299 !important;
+    text-align: center !important;
+    padding: 10px;
+  }
+  tr td {
+    text-align: center !important;
+  }
+  thead {
+    font-weight: bolder;
+    color: #99001A !important;
+  }
+  td {
+    padding-left: 5px;
+    padding-right: 5px;
+    border-top: solid rgb(151, 151, 151) 1px;
+  }
+  .btn_save {
+    background-color: #4895CC;
+    color: white;
+    width: 100px;
+  }
+  .formulario {
+    padding-bottom: 30px;
+    padding-top: 10px;
+  }
+  .salvar_editar {
+    padding: 10px 0;
+  }
