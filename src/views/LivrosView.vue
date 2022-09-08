@@ -1,24 +1,26 @@
 <script>
 import axios from "axios";
-import { v4 as uuid } from "uuid";
+import livrosApi from "../api/livros";
+const funcLivro = new livrosApi();
 export default {
   data() {
     return {
       livros: [],
       categorias: [],
-      autores: [],
+      autors: [],
       editoras: [],
       livro: {},
+      editando: false,
     };
   },
   async created() {
     await this.BuscarTodasAsEditoras();
     await this.BuscarTodasAsCategorias();
     await this.BuscarTodosOsAutors();
-    const livros = await axios.get(
-      "https://livrariadaluiza.herokuapp.com/livros?expand=categoria&expand=editora&expand=autor"
-    );
-    this.livros = livros.data;
+      const livros = await axios.get(
+        "https://livrariadaluiza.herokuapp.com/livros?expand=categoria&expand=editora&expand=autor"
+      );
+      this.livros = livros.data;
   },
   methods: {
     async BuscarTodasAsEditoras() {
@@ -33,25 +35,34 @@ export default {
       const autors = await axios.get("https://livrariadaluiza.herokuapp.com/autors");
       this.autors = autors.data;
     },
-    async salvar() {
-      const livro_criado = await axios.post(
-        "https://livrariadaluiza.herokuapp.com/livros",
-        this.livro
-      );
-      this.livros.push(livro_criado.data);
-      this.livro = {};
+    async BuscarTodosOsLivros() {
       const livros = await axios.get(
         "https://livrariadaluiza.herokuapp.com/livros?expand=categoria&expand=editora&expand=autor"
       );
       this.livros = livros.data;
     },
-    async excluir(livro) {
-      await axios.delete(`https://livrariadaluiza.herokuapp.com/livros/${livro.id}`);
-      const indice = this.livros.indexOf(livro);
-      this.livros.splice(indice, 1);
+    async salvar() {
+      if (this.livro.id) {
+        await livrosApi.atualizarLivro(this.livro);
+      } else {
+        await livrosApi.adicionarLivro(this.livro);
+      }
+      this.livros = await livrosApi.buscarTodosOsLivros();
+      this.livro = {};
     },
-    editar(livro) {
-      Object.assign(this.livro, livro);
+    async excluir(livro) {
+      await livrosApi.excluirLivro(livro.id);
+      this.livros = await livrosApi.buscarTodosOsLivros();
+    },
+    async editar() {
+      await funcLivro.atualizarLivro(this.livro)
+      this.editando = false
+      this.livro = {};
+      const livros = await axios.get(
+        "https://livrariadaluiza.herokuapp.com/livros?expand=categoria&expand=editora&expand=autor"
+      );
+      this.livros = livros.data;
+    
     },
   },
 };
@@ -118,7 +129,9 @@ export default {
             {{ editora.nome }}
           </option>
         </select>
-        <button class="btn btn_save" @click="salvar">Salvar</button>
+        <button class="btn btn_save" @click="salvar" v-if="this.editando == false">Salvar</button>
+        <button class="btn btn_save" @click="editar" v-if="this.editando == true">Atualizar</button>
+
       </div>
     </div>
 
@@ -143,7 +156,7 @@ export default {
             <td>{{ livro.editora.nome }}</td>
 
             <td class="button-group salvar_editar">
-              <button class="btn btn-primary" @click="editar(livro)">Editar</button>
+              <button class="btn btn-primary" @click="this.editando = true; this.livro = livro">Editar</button>
               <button class="btn btn-danger" @click="excluir(livro)">Excluir</button>
             </td>
           </tr>
