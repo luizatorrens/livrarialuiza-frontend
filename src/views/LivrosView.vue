@@ -42,11 +42,6 @@ export default {
       this.livros = livros.data;
     },
     async salvar() {
-      if (this.livro.id) {
-        await livrosApi.atualizarLivro(this.livro);
-      } else {
-        await livrosApi.adicionarLivro(this.livro);
-      }
       this.livros = await livrosApi.buscarTodosOsLivros();
       this.livro = {};
     },
@@ -151,7 +146,7 @@ export default {
           <tr v-for="livro in livros" :key="livro.id">
             <td>{{ livro.id }}</td>
             <td>{{ livro.nome }}</td>
-            <td>{{ livro.autorId }}</td>
+            <td>{{ livro.autor.nome }}</td>
             <td>{{ livro.categoria.nome }}</td>
             <td>{{ livro.editora.nome }}</td>
 

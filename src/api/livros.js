@@ -10,10 +10,10 @@ export default class livrosApi {
     return response.data;
   }
 
-  async adicionarLivro(livro) {
+  async adicionarLivro(novo_livro) {
     const response = await axios.post(
       "https://livrariadaluiza.herokuapp.com/livros",
-      livro
+      { novo_livro }
     );
     return response.data;
   }
